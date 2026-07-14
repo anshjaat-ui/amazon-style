@@ -10,7 +10,6 @@ export async function createOrder(req, res) {
     return res.status(400).json({ message: 'No order items' })
   }
 
-  // Security: price hamesha DB se lo, frontend se aaya price kabhi trust mat karo
   let itemsPrice = 0
   const verifiedItems = []
 
@@ -45,8 +44,6 @@ export async function createOrder(req, res) {
     paymentMethod: 'upi',
   })
 
-  // UPI deep link banao — mobile pe khulte hi UPI app (GPay/PhonePe/Paytm) mein
-  // pre-filled payment screen aa jaati hai
   const upiId = process.env.UPI_ID
   const upiName = process.env.UPI_NAME || 'Store'
   const note = `Order ${order._id.toString().slice(-8)}`
@@ -58,10 +55,8 @@ export async function createOrder(req, res) {
     `&cu=INR` +
     `&tn=${encodeURIComponent(note)}`
 
-  // QR code image (koi extra package nahi chahiye — free public QR image API)
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiLink)}`
 
-  // Admin ko turant WhatsApp pe notify karne ke liye link
   const whatsappNumber = process.env.WHATSAPP_NUMBER
   const waText = `Naya order!\nOrder ID: ${order._id}\nAmount: Rs ${totalPrice}\nCustomer: ${req.user.name} (${req.user.email})\nMain payment karke "I've Paid" bhejunga.`
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waText)}`
@@ -76,8 +71,7 @@ export async function createOrder(req, res) {
   })
 }
 
-// PUT /api/orders/:id/claim-payment -> customer bolta hai "maine pay kar diya"
-// Ye automatic verification NAHI hai — sirf ek claim hai, admin ko manually confirm karna hoga
+// PUT /api/orders/:id/claim-payment
 export async function claimPayment(req, res) {
   const { upiRef } = req.body
   const order = await Order.findById(req.params.id)
@@ -95,8 +89,7 @@ export async function claimPayment(req, res) {
   res.json({ message: 'Payment claim received. Verification pending.', order })
 }
 
-// PUT /api/orders/:id/confirm-payment (admin only) -> bank statement check karke
-// manually payment ko "paid" confirm karo, tabhi stock/cart update hote hain
+// PUT /api/orders/:id/confirm-payment (admin only)
 export async function confirmPayment(req, res) {
   const order = await Order.findById(req.params.id)
   if (!order) return res.status(404).json({ message: 'Order not found' })
