@@ -2,7 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import 'express-async-errors' // async controller errors ko errorHandler tak pahunchata hai
+import 'express-async-errors'
 import connectDB from './config/db.js'
 import { notFound, errorHandler } from './middleware/errorMiddleware.js'
 import Product from './models/Product.js'
@@ -17,29 +17,13 @@ connectDB()
 
 const app = express()
 
-// CLIENT_URL se sirf ek fixed origin allow hota tha — lekin Vercel har naye deploy
-// pe alag preview URL (hash ke saath) banata hai. Isliye ab hum check karte hain ki
-// request ka origin CLIENT_URL se match karta hai YA usi Vercel project ke kisi bhi
-// deployment se aa raha hai (pattern: project-name-*.vercel.app)
-const allowedOrigin = (process.env.CLIENT_URL || 'http://localhost:5173').replace(/\/$/, '')
-let vercelProjectPattern = null
-try {
-  const hostname = new URL(allowedOrigin).hostname
-  if (hostname.endsWith('.vercel.app')) {
-    const projectSlug = hostname.split('.vercel.app')[0].split('-')[0]
-    vercelProjectPattern = new RegExp(`^https:\\/\\/${projectSlug}[a-z0-9-]*\\.vercel\\.app$`)
-  }
-} catch {
-  // CLIENT_URL invalid URL hai to bas exact-match wala fallback use hoga
-}
-
 app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true)
-      if (origin === allowedOrigin) return callback(null, true)
-      if (vercelProjectPattern && vercelProjectPattern.test(origin)) return callback(null, true)
-      if (origin === 'http://localhost:5173') return callback(null, true)
+      if (origin.endsWith('.vercel.app')) return callback(null, true)
+      if (origin === (process.env.CLIENT_URL || '').replace(/\/$/, '')) return callback(null, true)
+      if (origin === 'http://localhost:5173' || origin === 'http://localhost:5174') return callback(null, true)
       callback(new Error(`CORS blocked for origin: ${origin}`))
     },
     credentials: true,
