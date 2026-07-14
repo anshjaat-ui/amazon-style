@@ -55,3 +55,9 @@ export async function addAddress(req, res) {
   await user.save()
   res.status(201).json(user.addresses)
 }
+
+// GET /api/auth/users (admin only)
+export async function getAllUsers(req, res) {
+  const users = await User.find({}).select('-password').sort({ createdAt: -1 })
+  res.json(users)
+}
