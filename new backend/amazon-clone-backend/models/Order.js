@@ -25,9 +25,9 @@ const orderSchema = new mongoose.Schema(
     shippingPrice: { type: Number, required: true, default: 0 },
     totalPrice: { type: Number, required: true },
 
-    paymentMethod: { type: String, default: 'upi' },
-    upiRef: String,
-    paymentClaimed: { type: Boolean, default: false },
+    paymentMethod: { type: String, default: 'razorpay' },
+    razorpayOrderId: String,
+    razorpayPaymentId: String,
     isPaid: { type: Boolean, default: false },
     paidAt: Date,
 
