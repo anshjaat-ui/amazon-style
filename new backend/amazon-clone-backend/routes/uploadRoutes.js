@@ -8,9 +8,9 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 *
 
 function getCloudinary() {
   cloudinary.config({
-    cloud_name: process.env.onrwmnju,
-    api_key: process.env.952195923342437,
-    api_secret: process.env.kDx2BN1U5d3cD5XhzdYJIJ_eO6E,
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
   })
   return cloudinary
 }
