@@ -1,8 +1,7 @@
 import express from 'express'
 import {
   createOrder,
-  claimPayment,
-  confirmPayment,
+  verifyPayment,
   getMyOrders,
   getOrderById,
   getAllOrders,
@@ -14,11 +13,10 @@ const router = express.Router()
 
 router.use(protect)
 router.post('/', createOrder)
+router.post('/verify', verifyPayment)
 router.get('/my', getMyOrders)
 router.get('/', admin, getAllOrders)
 router.get('/:id', getOrderById)
-router.put('/:id/claim-payment', claimPayment)
-router.put('/:id/confirm-payment', admin, confirmPayment)
 router.put('/:id/status', admin, updateOrderStatus)
 
 export default router
