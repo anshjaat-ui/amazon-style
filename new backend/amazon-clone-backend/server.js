@@ -2,6 +2,9 @@ import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
+import mongoSanitize from 'express-mongo-sanitize'
 import 'express-async-errors'
 import connectDB from './config/db.js'
 import { notFound, errorHandler } from './middleware/errorMiddleware.js'
@@ -11,11 +14,14 @@ import authRoutes from './routes/authRoutes.js'
 import productRoutes from './routes/productRoutes.js'
 import cartRoutes from './routes/cartRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
+import uploadRoutes from './routes/uploadRoutes.js'
 
 dotenv.config()
 connectDB()
 
 const app = express()
+
+app.use(helmet({ crossOriginResourcePolicy: false }))
 
 app.use(
   cors({
@@ -31,6 +37,15 @@ app.use(
 )
 app.use(express.json())
 app.use(cookieParser())
+app.use(mongoSanitize())
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { message: 'Bahut zyada attempts. 15 minute baad try karo.' },
+})
+app.use('/api/auth/login', authLimiter)
+app.use('/api/auth/signup', authLimiter)
 
 app.get('/', (req, res) => res.json({ status: 'API running' }))
 
@@ -91,6 +106,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/products', productRoutes)
 app.use('/api/cart', cartRoutes)
 app.use('/api/orders', orderRoutes)
+app.use('/api/upload', uploadRoutes)
 
 app.use(notFound)
 app.use(errorHandler)
