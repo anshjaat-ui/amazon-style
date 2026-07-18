@@ -23,6 +23,8 @@ const orderSchema = new mongoose.Schema(
     },
     itemsPrice: { type: Number, required: true },
     shippingPrice: { type: Number, required: true, default: 0 },
+    couponCode: String,
+    discountAmount: { type: Number, default: 0 },
     totalPrice: { type: Number, required: true },
 
     paymentMethod: { type: String, default: 'razorpay' },
@@ -33,7 +35,7 @@ const orderSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+      enum: ['pending', 'processing', 'shipped', 'out_for_delivery', 'delivered', 'cancelled'],
       default: 'pending',
     },
   },
