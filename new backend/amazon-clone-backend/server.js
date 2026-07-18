@@ -15,6 +15,9 @@ import productRoutes from './routes/productRoutes.js'
 import cartRoutes from './routes/cartRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
 import uploadRoutes from './routes/uploadRoutes.js'
+import couponRoutes from './routes/couponRoutes.js'
+import wishlistRoutes from './routes/wishlistRoutes.js'
+import settingsRoutes from './routes/settingsRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -107,6 +110,9 @@ app.use('/api/products', productRoutes)
 app.use('/api/cart', cartRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/upload', uploadRoutes)
+app.use('/api/coupons', couponRoutes)
+app.use('/api/wishlist', wishlistRoutes)
+app.use('/api/settings', settingsRoutes)
 
 app.use(notFound)
 app.use(errorHandler)
