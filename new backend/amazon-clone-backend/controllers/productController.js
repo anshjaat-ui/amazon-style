@@ -1,6 +1,5 @@
 import Product from '../models/Product.js'
 
-// GET /api/products?keyword=&category=&page=&minPrice=&maxPrice=
 export async function getProducts(req, res) {
   const pageSize = 12
   const page = Number(req.query.page) || 1
@@ -33,7 +32,19 @@ export async function getProducts(req, res) {
   })
 }
 
-// GET /api/products/:id
+export async function getSuggestions(req, res) {
+  const keyword = req.query.keyword || ''
+  if (!keyword.trim()) return res.json([])
+
+  const products = await Product.find({
+    name: { $regex: keyword, $options: 'i' },
+  })
+    .select('name images price category')
+    .limit(6)
+
+  res.json(products)
+}
+
 export async function getProductById(req, res) {
   const product = await Product.findById(req.params.id)
   if (!product) {
@@ -42,13 +53,11 @@ export async function getProductById(req, res) {
   res.json(product)
 }
 
-// POST /api/products  (admin only)
 export async function createProduct(req, res) {
   const product = await Product.create(req.body)
   res.status(201).json(product)
 }
 
-// PUT /api/products/:id  (admin only)
 export async function updateProduct(req, res) {
   const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -60,7 +69,6 @@ export async function updateProduct(req, res) {
   res.json(product)
 }
 
-// DELETE /api/products/:id  (admin only)
 export async function deleteProduct(req, res) {
   const product = await Product.findByIdAndDelete(req.params.id)
   if (!product) {
@@ -69,7 +77,6 @@ export async function deleteProduct(req, res) {
   res.json({ message: 'Product removed' })
 }
 
-// POST /api/products/:id/reviews
 export async function addReview(req, res) {
   const { rating, comment } = req.body
   const product = await Product.findById(req.params.id)
