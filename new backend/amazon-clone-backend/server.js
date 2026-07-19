@@ -18,6 +18,8 @@ import uploadRoutes from './routes/uploadRoutes.js'
 import couponRoutes from './routes/couponRoutes.js'
 import wishlistRoutes from './routes/wishlistRoutes.js'
 import settingsRoutes from './routes/settingsRoutes.js'
+import categoryRoutes from './routes/categoryRoutes.js'
+import Category from './models/Category.js'
 
 dotenv.config()
 connectDB()
@@ -113,6 +115,27 @@ app.use('/api/upload', uploadRoutes)
 app.use('/api/coupons', couponRoutes)
 app.use('/api/wishlist', wishlistRoutes)
 app.use('/api/settings', settingsRoutes)
+app.use('/api/categories', categoryRoutes)
+
+app.get('/api/seed-categories/:key', async (req, res) => {
+  if (req.params.key !== process.env.SEED_KEY) {
+    return res.status(403).json({ message: 'Invalid seed key' })
+  }
+  const defaults = [
+    { name: 'Electronics', emoji: '📱', order: 1 },
+    { name: 'Fashion', emoji: '👗', order: 2 },
+    { name: 'Home & Kitchen', emoji: '🏠', order: 3 },
+    { name: 'Books', emoji: '📚', order: 4 },
+    { name: 'Beauty', emoji: '💄', order: 5 },
+    { name: 'Sports', emoji: '⚽', order: 6 },
+    { name: 'Toys', emoji: '🧸', order: 7 },
+    { name: 'Grocery', emoji: '🛒', order: 8 },
+    { name: 'Mobiles', emoji: '📞', order: 9 },
+  ]
+  await Category.deleteMany()
+  await Category.insertMany(defaults)
+  res.json({ message: `${defaults.length} categories inserted!` })
+})
 
 app.use(notFound)
 app.use(errorHandler)
