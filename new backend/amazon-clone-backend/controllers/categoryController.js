@@ -6,18 +6,33 @@ export async function getCategories(req, res) {
 }
 
 export async function createCategory(req, res) {
-  const { name, emoji, order } = req.body
+  const { name, icon, order } = req.body   // ✅ emoji → icon
+
   const exists = await Category.findOne({ name })
   if (exists) {
     return res.status(400).json({ message: 'Category already exists' })
   }
-  const category = await Category.create({ name, emoji, order })
+
+  const category = await Category.create({
+    name,
+    icon,   // ✅ SAVE ICON
+    order
+  })
+
   res.status(201).json(category)
 }
 
 export async function updateCategory(req, res) {
-  const category = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true })
+  const { name, icon } = req.body   // ✅ ensure icon included
+
+  const category = await Category.findByIdAndUpdate(
+    req.params.id,
+    { name, icon },   // ✅ update icon also
+    { new: true }
+  )
+
   if (!category) return res.status(404).json({ message: 'Category not found' })
+
   res.json(category)
 }
 
